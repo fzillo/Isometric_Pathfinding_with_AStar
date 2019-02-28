@@ -9702,6 +9702,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65c7153e82b52604bb0d3518d6bed058, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tilemap: {fileID: 603293422}
+  startX: 0
+  startY: 0
+  goalX: 31
+  goalY: 31
+  deadTerrain: {fileID: 11400000, guid: a4932056f6c4bdc48963ead6a5ec46bf, type: 2}
+  grassTerrain: {fileID: 11400000, guid: 0f6777aae7fcbf042993ffd47678fa67, type: 2}
+  sandTerrain: {fileID: 11400000, guid: edc51da0b1fb964409d76704c418dd06, type: 2}
+  waterTerrain: {fileID: 11400000, guid: 729fd8db964d9db46962c7191f889a5d, type: 2}
 --- !u!4 &893247301
 Transform:
   m_ObjectHideFlags: 0
@@ -9746,6 +9755,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8425c5eac9d61aa4fba798402eb15392, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mapManager: {fileID: 893247300}
 --- !u!4 &1377297737
 Transform:
   m_ObjectHideFlags: 0
@@ -9769,7 +9779,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1884050546}
-  - component: {fileID: 1884050545}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -9777,20 +9786,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1884050545
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1884050544}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e65ae628c5e56b04d86a6e4ac76d7dd5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mapManager: {fileID: 0}
-  pathfinder: {fileID: 0}
 --- !u!4 &1884050546
 Transform:
   m_ObjectHideFlags: 0

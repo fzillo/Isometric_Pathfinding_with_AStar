@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public MapManager mapManager;
     public Pathfinder pathfinder;
 
     void Start()

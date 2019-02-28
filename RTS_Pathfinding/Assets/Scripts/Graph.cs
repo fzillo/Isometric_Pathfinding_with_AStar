@@ -6,31 +6,49 @@ public class Graph
 {
     Node[,] nodes;
 
-    int maximum_xPosition = 31;
-    int maximum_yPosition = 31;
+    int m_width;
+    int m_height;
 
-    public MapManager mapManager;
+    int[,] mapData;
 
-    void Awake()
+    private Graph()
     {
-        if (mapManager != null)
-        {
-            maximum_xPosition = mapManager.MapWidth;
-            maximum_yPosition = mapManager.MapHeight;
-        } else
-        {
-            Debug.LogWarning("MapManager not found. Initializing nodearray with default values:" +
-                " maximum_xPosition " + maximum_xPosition + " maximum_yPosition " + maximum_yPosition);
-        }
-        nodes = new Node[maximum_xPosition, maximum_yPosition];
+    }
 
-        for (int x=0; x <= maximum_xPosition; x++)
+    public Graph(int[,] mapData)
+    {
+        Init(mapData);
+    }
+
+    void Init(int[,] mapData)
+    {
+        //if (mapManager != null)
+        //{
+        //    maximum_xPosition = mapManager.MapWidth;
+        //    maximum_yPosition = mapManager.MapHeight;
+        //} else
+        //{
+        //    Debug.LogWarning("MapManager not found. Initializing nodearray with default values:" +
+        //        " maximum_xPosition " + maximum_xPosition + " maximum_yPosition " + maximum_yPosition);
+        //}
+
+        m_width = mapData.GetLength(0);
+        m_height = mapData.GetLength(1);
+
+        nodes = new Node[m_width, m_height];
+
+        for (int x=0; x <= m_width; x++)
         {
-            for (int y = 0; y <= maximum_yPosition; y++)
+            for (int y = 0; y <= m_height; y++)
             {
-                Node.NodeType newNodeType = mapManager.GetNodeTypeFromTileMap(x, y);
+                Node.NodeType newNodeType = (Node.NodeType) mapData[x, y];
                 nodes[x, y] = new Node(x, y, newNodeType);
             }
         }
+    }
+
+    public Node GetNodeAtPosition(int xPosition, int yPosition)
+    {
+        return nodes[xPosition, yPosition];
     }
 }

@@ -4,15 +4,21 @@ using UnityEngine;
 
 public class Pathfinder : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public MapData mapData;
+
+    Graph m_graph;
+    Node m_startNode;
+    Node m_goalNode;
+    
     void Start()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        if (mapData == null)
+        {
+            Debug.LogWarning("Could not initialize pathfinder!");
+            return;
+        }
+        m_graph = new Graph();
+        m_startNode = m_graph.GetNodeAtPosition(mapData.startX, mapData.startY);
+        m_goalNode = m_graph.GetNodeAtPosition(mapData.startX, mapData.startY);
     }
 }

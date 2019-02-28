@@ -13,7 +13,7 @@ public class Node
     public enum NodeType
     {
         blockedTerrain=0,
-        lightTerrain=1,
+        easyTerrain=1,
         mediumTerrain=2,
         hardTerrain=3
     }
