@@ -5,10 +5,18 @@ using UnityEngine;
 public class Node
 {
     int m_xPosition;
+    public int PositionX { get { return m_xPosition; } }
     int m_yPosition;
-    NodeType m_nodeType;
+    public int PositionY { get { return m_yPosition; } }
 
-    List<Node> adjacentNodes;
+    NodeType m_nodeType;
+    public NodeType Type { get { return m_nodeType; } }
+
+    public List<Node> adjacentNodes;
+
+    public Node previousNode;
+
+    //public float distanceTraveled;
 
     public enum NodeType
     {
