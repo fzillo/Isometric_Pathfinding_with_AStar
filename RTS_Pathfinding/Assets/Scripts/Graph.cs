@@ -9,6 +9,9 @@ public class Graph
     int m_width;
     int m_height;
 
+    private float m_distanceUnitsStraight = 1f;
+    private float m_distanceUnitsDiagonal = 1.4f; //pythagoras
+
     //int[,] mapData;
 
     public static readonly Vector2[] allDirections =
@@ -93,5 +96,31 @@ public class Graph
         }
 
         return adjacentNodes;
+    }
+
+    /*
+    * to find the shortest distance, you first go diagonal steps which are equal to the smaller "axis-difference" (x or y),
+    * then you go the remaining steps in a straight line.
+    */
+    public float DistanceBetweenNodes(Node nodeFrom, Node nodeTo)
+    {        
+        int absDeltaX = Mathf.Abs(nodeFrom.PositionX - nodeTo.PositionX);
+        int absDeltaY = Mathf.Abs(nodeFrom.PositionY - nodeTo.PositionY);
+
+        int stepsDiagonal;
+        int stepsStraight;
+               
+        if (absDeltaX >= absDeltaY)
+        {
+            stepsDiagonal = absDeltaY;
+            stepsStraight = absDeltaX - absDeltaY;            
+        }
+        else
+        {
+            stepsDiagonal = absDeltaX;
+            stepsStraight = absDeltaY - absDeltaX;
+        }
+
+        return m_distanceUnitsDiagonal * stepsDiagonal + m_distanceUnitsStraight * stepsStraight;
     }
 }

@@ -9941,8 +9941,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mapData: {fileID: 893247300}
   graphView: {fileID: 850954546}
-  showIterations: 1
+  showIterations: 0
   timeStepIterations: 0.1
+  configuredAlgorithm: 1
 --- !u!4 &1377297737
 Transform:
   m_ObjectHideFlags: 0

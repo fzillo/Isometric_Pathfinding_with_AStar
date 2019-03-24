@@ -21,7 +21,15 @@ public class Pathfinder : MonoBehaviour
     public bool showIterations = false;
     public float timeStepIterations = .1f;
 
+    public SearchAlgorithm configuredAlgorithm = SearchAlgorithm.BreadthFirst;
+
     bool isComplete = false;
+
+    public enum SearchAlgorithm
+    {
+        BreadthFirst,
+        Dijkstra
+    }
 
     public void Init(int startPosX, int startPosY, int goalPosX, int goalPosY)
     {
@@ -38,6 +46,7 @@ public class Pathfinder : MonoBehaviour
         //m_startNode = m_graph.GetNodeAtPosition(mapData.startX, mapData.startY);
         //m_goalNode = m_graph.GetNodeAtPosition(mapData.startX, mapData.startY);
         m_startNode = m_graph.GetNodeAtPosition(startPosX, startPosY);
+        m_startNode.distanceFromStart = 0;
         m_goalNode = m_graph.GetNodeAtPosition(goalPosX, goalPosY);
         
         m_frontierNodes = new PriorityQueue<Node>();
@@ -70,8 +79,14 @@ public class Pathfinder : MonoBehaviour
                     m_exploredNodes.Add(currentNode);
                 }
 
-                ExpandFrontierBreadthFirst(currentNode);
-                //ExpandFrontierAStar(currentNode);
+                if (SearchAlgorithm.BreadthFirst.Equals(configuredAlgorithm))
+                {
+                    ExpandFrontierBreadthFirst(currentNode);
+                }
+                else if (SearchAlgorithm.Dijkstra.Equals(configuredAlgorithm))
+                {
+                    ExpandFrontierDijkstra(currentNode);
+                }
 
                 if (m_frontierNodes.Contains(m_goalNode))
                 {
@@ -115,13 +130,43 @@ public class Pathfinder : MonoBehaviour
 
                 //this way it still works with priorityqueue
                 currentNode.adjacentNodes[i].priority = m_exploredNodes.Count;
-                Debug.Log("Explored nodes count: "+ m_exploredNodes.Count);
+                //Debug.Log("Explored nodes count: "+ m_exploredNodes.Count);
 
                 m_frontierNodes.Enqueue(currentNode.adjacentNodes[i]);
             }
         }
     }
-    
+
+    void ExpandFrontierDijkstra(Node node)
+    {
+        if (node == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < node.adjacentNodes.Count; i++)
+        {
+            if (!m_exploredNodes.Contains(node.adjacentNodes[i]))
+            {
+                float distanceBetweenNodes = m_graph.DistanceBetweenNodes(node, node.adjacentNodes[i]);
+                float distanceFromStart =    node.distanceFromStart + distanceBetweenNodes; //+terraincosts
+
+                if (float.IsPositiveInfinity(node.adjacentNodes[i].distanceFromStart)
+                        || distanceFromStart < node.adjacentNodes[i].distanceFromStart)
+                {
+                    node.adjacentNodes[i].previousNode = node;
+                    node.adjacentNodes[i].distanceFromStart = distanceFromStart;
+                }
+
+                if (!m_frontierNodes.Contains(node.adjacentNodes[i]))
+                {
+                    node.adjacentNodes[i].priority = node.adjacentNodes[i].distanceFromStart;
+                    m_frontierNodes.Enqueue(node.adjacentNodes[i]);
+                }
+            }   
+        }
+    }
+
     void ExpandFrontierAStar(Node currentNode)
     {
         throw new NotImplementedException();

@@ -17,9 +17,9 @@ public class Node : IComparable<Node>
 
     public Node previousNode;
 
-    public int priority;
+    public float priority;
 
-    //public float distanceTraveled;
+    public float distanceFromStart = Mathf.Infinity;
 
     public enum NodeType
     {
@@ -50,4 +50,5 @@ public class Node : IComparable<Node>
             return 0;
         }
     }
+    
 }
