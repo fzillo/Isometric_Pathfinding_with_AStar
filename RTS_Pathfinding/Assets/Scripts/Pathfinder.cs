@@ -13,7 +13,7 @@ public class Pathfinder : MonoBehaviour
     Node m_startNode;
     Node m_goalNode;
 
-    Queue<Node> m_frontierNodes;
+    PriorityQueue<Node> m_frontierNodes;
     List<Node> m_exploredNodes;
     List<Node> m_pathNodes;
 
@@ -40,7 +40,7 @@ public class Pathfinder : MonoBehaviour
         m_startNode = m_graph.GetNodeAtPosition(startPosX, startPosY);
         m_goalNode = m_graph.GetNodeAtPosition(goalPosX, goalPosY);
         
-        m_frontierNodes = new Queue<Node>();
+        m_frontierNodes = new PriorityQueue<Node>();
         m_frontierNodes.Enqueue(m_startNode);
         m_exploredNodes = new List<Node>();
         m_pathNodes = new List<Node>();
@@ -100,7 +100,7 @@ public class Pathfinder : MonoBehaviour
         Debug.Log("Pathfinder elapsed time: " + (Time.realtimeSinceStartup - timeStart).ToString());
     }
 
-    private void ExpandFrontierBreadthFirst(Node currentNode)
+    void ExpandFrontierBreadthFirst(Node currentNode)
     {
         if (currentNode == null)
         {
@@ -112,11 +112,16 @@ public class Pathfinder : MonoBehaviour
             if (!m_exploredNodes.Contains(currentNode.adjacentNodes[i]) && !m_frontierNodes.Contains(currentNode.adjacentNodes[i]))
             {
                 currentNode.adjacentNodes[i].previousNode = currentNode;
+
+                //this way it still works with priorityqueue
+                currentNode.adjacentNodes[i].priority = m_exploredNodes.Count;
+                Debug.Log("Explored nodes count: "+ m_exploredNodes.Count);
+
                 m_frontierNodes.Enqueue(currentNode.adjacentNodes[i]);
             }
         }
     }
-
+    
     void ExpandFrontierAStar(Node currentNode)
     {
         throw new NotImplementedException();
@@ -145,7 +150,7 @@ public class Pathfinder : MonoBehaviour
     {
         if (graphView != null)
         {
-            graphView.PaintNodes(new List<Node>(m_frontierNodes), graphView.colorBorder);
+            graphView.PaintNodes(new List<Node>(m_frontierNodes.ToList()), graphView.colorBorder);
             graphView.PaintNodes(m_exploredNodes, graphView.colorExplored);
             graphView.PaintNodes(m_pathNodes, graphView.colorPath);
         }

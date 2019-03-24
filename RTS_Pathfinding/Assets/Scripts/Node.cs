@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
-public class Node
+public class Node : IComparable<Node>
 {
     int m_xPosition;
     public int PositionX { get { return m_xPosition; } }
@@ -15,6 +16,8 @@ public class Node
     public List<Node> adjacentNodes;
 
     public Node previousNode;
+
+    public int priority;
 
     //public float distanceTraveled;
 
@@ -31,5 +34,20 @@ public class Node
         this.m_xPosition = xPosition;
         this.m_yPosition = yPosition;
         this.m_nodeType = nodeType;
+    }
+
+    // used for sorting order priorityqueue
+    public int CompareTo(Node other)
+    {
+        if(this.priority < other.priority)
+        {
+            return -1;
+        } else if (this.priority > other.priority)
+        {
+            return 1;
+        } else
+        {
+            return 0;
+        }
     }
 }
