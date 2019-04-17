@@ -21,6 +21,8 @@ public class Pathfinder : MonoBehaviour
     public bool showIterations = false;
     public float timeStepIterations = .1f;
 
+    public bool ignoreTerraincosts = false;
+
     public SearchAlgorithm configuredAlgorithm = SearchAlgorithm.BreadthFirst;
 
     bool isComplete = false;
@@ -47,6 +49,7 @@ public class Pathfinder : MonoBehaviour
         //m_goalNode = m_graph.GetNodeAtPosition(mapData.startX, mapData.startY);
         m_startNode = m_graph.GetNodeAtPosition(startPosX, startPosY);
         m_startNode.distanceFromStart = 0;
+        m_startNode.costsFromStart = 0;
         m_goalNode = m_graph.GetNodeAtPosition(goalPosX, goalPosY);
         
         m_frontierNodes = new PriorityQueue<Node>();
@@ -115,24 +118,30 @@ public class Pathfinder : MonoBehaviour
         Debug.Log("Pathfinder elapsed time: " + (Time.realtimeSinceStartup - timeStart).ToString());
     }
 
-    void ExpandFrontierBreadthFirst(Node currentNode)
+    void ExpandFrontierBreadthFirst(Node node)
     {
-        if (currentNode == null)
+        if (node == null)
         {
             return;
         }
 
-        for (int i = 0; i < currentNode.adjacentNodes.Count; i++)
+        for (int i = 0; i < node.adjacentNodes.Count; i++)
         {
-            if (!m_exploredNodes.Contains(currentNode.adjacentNodes[i]) && !m_frontierNodes.Contains(currentNode.adjacentNodes[i]))
+            if (!m_exploredNodes.Contains(node.adjacentNodes[i]) && !m_frontierNodes.Contains(node.adjacentNodes[i]))
             {
-                currentNode.adjacentNodes[i].previousNode = currentNode;
+                //START BLOCK the values are only included for debugging purposes - they are not used for priority and dont affect the algorithm
+                float distanceToAdjacent = m_graph.DistanceBetweenNodes(node, node.adjacentNodes[i]);
+                float distanceFromStart = node.distanceFromStart + distanceToAdjacent;
+                float costsFromStart = node.costsFromStart + distanceToAdjacent + node.hazardValue;
+                //END BLOCK
+                
+                node.adjacentNodes[i].previousNode = node;
 
-                //this way it still works with priorityqueue
-                currentNode.adjacentNodes[i].priority = m_exploredNodes.Count;
+                //this way it still works with priorityqueue - because it just counts up
+                node.adjacentNodes[i].priority = m_exploredNodes.Count;
                 //Debug.Log("Explored nodes count: "+ m_exploredNodes.Count);
 
-                m_frontierNodes.Enqueue(currentNode.adjacentNodes[i]);
+                m_frontierNodes.Enqueue(node.adjacentNodes[i]);
             }
         }
     }
@@ -148,21 +157,43 @@ public class Pathfinder : MonoBehaviour
         {
             if (!m_exploredNodes.Contains(node.adjacentNodes[i]))
             {
-                float distanceBetweenNodes = m_graph.DistanceBetweenNodes(node, node.adjacentNodes[i]);
-                float distanceFromStart =    node.distanceFromStart + distanceBetweenNodes; //+terraincosts
-
-                if (float.IsPositiveInfinity(node.adjacentNodes[i].distanceFromStart)
-                        || distanceFromStart < node.adjacentNodes[i].distanceFromStart)
+                float distanceToAdjacent = m_graph.DistanceBetweenNodes(node, node.adjacentNodes[i]);
+                float distanceFromStart = node.distanceFromStart + distanceToAdjacent;
+                float costsFromStart = node.costsFromStart + distanceToAdjacent + node.hazardValue; //this way the terraincosts get included
+                
+                if (!ignoreTerraincosts)
                 {
-                    node.adjacentNodes[i].previousNode = node;
-                    node.adjacentNodes[i].distanceFromStart = distanceFromStart;
+                    if (float.IsPositiveInfinity(node.adjacentNodes[i].costsFromStart)
+                            || costsFromStart < node.adjacentNodes[i].costsFromStart)
+
+                    {
+                        node.adjacentNodes[i].previousNode = node;
+                        node.adjacentNodes[i].costsFromStart = costsFromStart;
+                    }
+
+                    if (!m_frontierNodes.Contains(node.adjacentNodes[i]))
+                    {
+                        node.adjacentNodes[i].priority = node.adjacentNodes[i].costsFromStart;
+                        m_frontierNodes.Enqueue(node.adjacentNodes[i]);
+                    }
+                }
+                else
+                {
+                    if (float.IsPositiveInfinity(node.adjacentNodes[i].distanceFromStart)
+                            || distanceFromStart < node.adjacentNodes[i].distanceFromStart)
+                    {
+                        node.adjacentNodes[i].previousNode = node;
+                        node.adjacentNodes[i].distanceFromStart = distanceFromStart;
+                    }
+
+                    if (!m_frontierNodes.Contains(node.adjacentNodes[i]))
+                    {
+                        node.adjacentNodes[i].priority = node.adjacentNodes[i].distanceFromStart;
+                        m_frontierNodes.Enqueue(node.adjacentNodes[i]);
+                    }
                 }
 
-                if (!m_frontierNodes.Contains(node.adjacentNodes[i]))
-                {
-                    node.adjacentNodes[i].priority = node.adjacentNodes[i].distanceFromStart;
-                    m_frontierNodes.Enqueue(node.adjacentNodes[i]);
-                }
+               
             }   
         }
     }

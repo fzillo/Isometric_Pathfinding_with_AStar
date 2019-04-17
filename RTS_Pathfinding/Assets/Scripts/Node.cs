@@ -13,6 +13,13 @@ public class Node : IComparable<Node>
     NodeType m_nodeType;
     public NodeType Type { get { return m_nodeType; } }
 
+    //TODO right now this represents only the obstruction by terrain - it could additionally represent the distance to enemies
+    public float hazardValue {
+            get {
+                    return (float) Type;
+                }            
+            }
+
     public List<Node> adjacentNodes;
 
     public Node previousNode;
@@ -20,6 +27,7 @@ public class Node : IComparable<Node>
     public float priority;
 
     public float distanceFromStart = Mathf.Infinity;
+    public float costsFromStart = Mathf.Infinity;   //this way you can track hazardous terrain
 
     public enum NodeType
     {

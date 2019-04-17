@@ -10,7 +10,7 @@ public class Graph
     int m_height;
 
     private float m_distanceUnitsStraight = 1f;
-    private float m_distanceUnitsDiagonal = 1.4f; //pythagoras
+    private float m_distanceUnitsDiagonal = 1.4f; //~pythagoras of root(1^2+1^2)
 
     //int[,] mapData;
 
@@ -99,7 +99,7 @@ public class Graph
     }
 
     /*
-    * to find the shortest distance, you first go diagonal steps which are equal to the smaller "axis-difference" (x or y),
+    * to find the shortest distance, you first go diagonal steps which are equal to the smaller absolute delta (x xor y),
     * then you go the remaining steps in a straight line.
     */
     public float DistanceBetweenNodes(Node nodeFrom, Node nodeTo)
