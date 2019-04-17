@@ -20,9 +20,7 @@ public class Pathfinder : MonoBehaviour
     int m_iterations;
     public bool showIterations = false;
     public float timeStepIterations = .1f;
-
-    public bool ignoreTerraincosts = false;
-
+    
     public SearchAlgorithm configuredAlgorithm = SearchAlgorithm.BreadthFirst;
 
     bool isComplete = false;
@@ -30,7 +28,9 @@ public class Pathfinder : MonoBehaviour
     public enum SearchAlgorithm
     {
         BreadthFirst,
-        Dijkstra
+        Dijkstra,
+        GreedyBestFirst,
+        AStar
     }
 
     public void Init(int startPosX, int startPosY, int goalPosX, int goalPosY)
@@ -51,7 +51,7 @@ public class Pathfinder : MonoBehaviour
         m_startNode.distanceFromStart = 0;
         m_startNode.costsFromStart = 0;
         m_goalNode = m_graph.GetNodeAtPosition(goalPosX, goalPosY);
-        
+
         m_frontierNodes = new PriorityQueue<Node>();
         m_frontierNodes.Enqueue(m_startNode);
         m_exploredNodes = new List<Node>();
@@ -90,12 +90,22 @@ public class Pathfinder : MonoBehaviour
                 {
                     ExpandFrontierDijkstra(currentNode);
                 }
+                else if (SearchAlgorithm.GreedyBestFirst.Equals(configuredAlgorithm))
+                {
+                    ExpandFrontierGreedyBestFirst(currentNode);
+                }
+                else 
+                {
+                    ExpandFrontierAStar(currentNode);
+                }
 
                 if (m_frontierNodes.Contains(m_goalNode))
                 {
                     m_pathNodes = GetPathNodes(m_goalNode);
                     isComplete = true;
                     Debug.Log("Path has been found in " + m_iterations + " iterations!");
+                    Debug.Log("Path distance " + m_goalNode.distanceFromStart + "!");
+                    Debug.Log("Path costs " + m_goalNode.costsFromStart + "!");
                 }
 
 
@@ -129,12 +139,14 @@ public class Pathfinder : MonoBehaviour
         {
             if (!m_exploredNodes.Contains(node.adjacentNodes[i]) && !m_frontierNodes.Contains(node.adjacentNodes[i]))
             {
-                //START BLOCK the values are only included for debugging purposes - they are not used for priority and dont affect the algorithm
-                float distanceToAdjacent = m_graph.DistanceBetweenNodes(node, node.adjacentNodes[i]);
-                float distanceFromStart = node.distanceFromStart + distanceToAdjacent;
-                float costsFromStart = node.costsFromStart + distanceToAdjacent + node.hazardValue;
+                //START BLOCK the values are only included for debugging purposes, they are not used for priority - comment out for more performance
+                float distanceToAdjacent = m_graph.DetermineDistanceBetweenNodes(node, node.adjacentNodes[i]);
+                float newDistanceFromStart = node.distanceFromStart + distanceToAdjacent;
+                float newCostsFromStart = node.costsFromStart + distanceToAdjacent + node.hazardValue;
+                node.adjacentNodes[i].distanceFromStart = newDistanceFromStart;
+                node.adjacentNodes[i].costsFromStart = newCostsFromStart;
                 //END BLOCK
-                
+
                 node.adjacentNodes[i].previousNode = node;
 
                 //this way it still works with priorityqueue - because it just counts up
@@ -157,40 +169,26 @@ public class Pathfinder : MonoBehaviour
         {
             if (!m_exploredNodes.Contains(node.adjacentNodes[i]))
             {
-                float distanceToAdjacent = m_graph.DistanceBetweenNodes(node, node.adjacentNodes[i]);
-                float distanceFromStart = node.distanceFromStart + distanceToAdjacent;
-                float costsFromStart = node.costsFromStart + distanceToAdjacent + node.hazardValue; //this way the terraincosts get included
-                
-                if (!ignoreTerraincosts)
+                float distanceToAdjacent = m_graph.DetermineDistanceBetweenNodes(node, node.adjacentNodes[i]);
+                float newDistanceFromStart = node.distanceFromStart + distanceToAdjacent;
+                float newCostsFromStart = node.costsFromStart + distanceToAdjacent + node.hazardValue; //this way the terraincosts get included
+
+                //if (float.IsPositiveInfinity(node.adjacentNodes[i].distanceFromStart)
+                //        || distanceFromStart < node.adjacentNodes[i].distanceFromStart)
+                if (float.IsPositiveInfinity(node.adjacentNodes[i].costsFromStart)
+                        || newCostsFromStart < node.adjacentNodes[i].costsFromStart)
+
                 {
-                    if (float.IsPositiveInfinity(node.adjacentNodes[i].costsFromStart)
-                            || costsFromStart < node.adjacentNodes[i].costsFromStart)
-
-                    {
-                        node.adjacentNodes[i].previousNode = node;
-                        node.adjacentNodes[i].costsFromStart = costsFromStart;
-                    }
-
-                    if (!m_frontierNodes.Contains(node.adjacentNodes[i]))
-                    {
-                        node.adjacentNodes[i].priority = node.adjacentNodes[i].costsFromStart;
-                        m_frontierNodes.Enqueue(node.adjacentNodes[i]);
-                    }
+                    node.adjacentNodes[i].previousNode = node;
+                    node.adjacentNodes[i].distanceFromStart = newDistanceFromStart;
+                    node.adjacentNodes[i].costsFromStart = newCostsFromStart;
                 }
-                else
-                {
-                    if (float.IsPositiveInfinity(node.adjacentNodes[i].distanceFromStart)
-                            || distanceFromStart < node.adjacentNodes[i].distanceFromStart)
-                    {
-                        node.adjacentNodes[i].previousNode = node;
-                        node.adjacentNodes[i].distanceFromStart = distanceFromStart;
-                    }
 
-                    if (!m_frontierNodes.Contains(node.adjacentNodes[i]))
-                    {
-                        node.adjacentNodes[i].priority = node.adjacentNodes[i].distanceFromStart;
-                        m_frontierNodes.Enqueue(node.adjacentNodes[i]);
-                    }
+                if (!m_frontierNodes.Contains(node.adjacentNodes[i]))
+                {
+                    //node.adjacentNodes[i].priority = node.adjacentNodes[i].distanceFromStart;
+                    node.adjacentNodes[i].priority = node.adjacentNodes[i].costsFromStart;
+                    m_frontierNodes.Enqueue(node.adjacentNodes[i]);
                 }
 
                
@@ -198,9 +196,76 @@ public class Pathfinder : MonoBehaviour
         }
     }
 
-    void ExpandFrontierAStar(Node currentNode)
+    void ExpandFrontierGreedyBestFirst(Node node)
     {
-        throw new NotImplementedException();
+        if (node == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < node.adjacentNodes.Count; i++)
+        {
+            if (!m_exploredNodes.Contains(node.adjacentNodes[i]) && !m_frontierNodes.Contains(node.adjacentNodes[i]))
+            {
+                //START BLOCK the values are only included for debugging purposes, they are not used for priority - comment out for more performance
+                float distanceToAdjacent = m_graph.DetermineDistanceBetweenNodes(node, node.adjacentNodes[i]);
+                float newDistanceFromStart = node.distanceFromStart + distanceToAdjacent;
+                float newCostsFromStart = node.costsFromStart + distanceToAdjacent + node.hazardValue;
+                node.adjacentNodes[i].distanceFromStart = newDistanceFromStart;
+                node.adjacentNodes[i].costsFromStart = newCostsFromStart;
+                //END BLOCK
+
+                node.adjacentNodes[i].previousNode = node;
+
+                if (m_graph != null)
+                {
+                    //node.adjacentNodes[i].priority = m_graph.DetermineDistanceBetweenNodes(node.adjacentNodes[i], m_goalNode);
+                    node.adjacentNodes[i].priority = m_graph.DetermineManhattanDistanceBetweenNodes(node.adjacentNodes[i], m_goalNode);
+                }
+
+                m_frontierNodes.Enqueue(node.adjacentNodes[i]);
+            }
+        }
+    }
+
+
+    //see https://en.wikipedia.org/wiki/A*_search_algorithm
+    void ExpandFrontierAStar(Node node)
+    {
+        if (node == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < node.adjacentNodes.Count; i++)
+        {
+            if (!m_exploredNodes.Contains(node.adjacentNodes[i]))
+            {
+                float distanceToAdjacent = m_graph.DetermineDistanceBetweenNodes(node, node.adjacentNodes[i]);
+                float newDistanceFromStart = node.distanceFromStart + distanceToAdjacent;
+                float newCostsFromStart = node.costsFromStart + distanceToAdjacent + node.hazardValue; //this way the terraincosts get included
+                
+                if (float.IsPositiveInfinity(node.adjacentNodes[i].costsFromStart)
+                        || newCostsFromStart < node.adjacentNodes[i].costsFromStart)
+
+                {
+                    node.adjacentNodes[i].previousNode = node;
+                    node.adjacentNodes[i].distanceFromStart = newDistanceFromStart;
+                    node.adjacentNodes[i].costsFromStart = newCostsFromStart;
+                }
+
+                if (!m_frontierNodes.Contains(node.adjacentNodes[i]) && m_graph != null)
+                {
+                    float distanceToGoal = m_graph.DetermineDistanceBetweenNodes(node.adjacentNodes[i],m_goalNode);
+
+                    //AStar: f = g + h
+                    node.adjacentNodes[i].priority = node.adjacentNodes[i].costsFromStart + distanceToGoal;
+                    m_frontierNodes.Enqueue(node.adjacentNodes[i]);
+                }
+
+
+            }
+        }
     }
 
     List<Node> GetPathNodes(Node endNode)
@@ -227,8 +292,10 @@ public class Pathfinder : MonoBehaviour
         if (graphView != null)
         {
             graphView.PaintNodes(new List<Node>(m_frontierNodes.ToList()), graphView.colorBorder);
-            graphView.PaintNodes(m_exploredNodes, graphView.colorExplored);
+            graphView.PaintNodesDependentOnNodeType(m_exploredNodes);
             graphView.PaintNodes(m_pathNodes, graphView.colorPath);
+            graphView.PaintNode(m_startNode, graphView.colorStart);
+            graphView.PaintNode(m_goalNode, graphView.colorGoal);
         }
     }
 }

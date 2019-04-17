@@ -102,7 +102,7 @@ public class Graph
     * to find the shortest distance, you first go diagonal steps which are equal to the smaller absolute delta (x xor y),
     * then you go the remaining steps in a straight line.
     */
-    public float DistanceBetweenNodes(Node nodeFrom, Node nodeTo)
+    public float DetermineDistanceBetweenNodes(Node nodeFrom, Node nodeTo)
     {        
         int absDeltaX = Mathf.Abs(nodeFrom.PositionX - nodeTo.PositionX);
         int absDeltaY = Mathf.Abs(nodeFrom.PositionY - nodeTo.PositionY);
@@ -123,4 +123,17 @@ public class Graph
 
         return m_distanceUnitsDiagonal * stepsDiagonal + m_distanceUnitsStraight * stepsStraight;
     }
+
+    /*
+     * Rougher, slightly more performant estimation of distance
+     * see https://en.wikipedia.org/wiki/Taxicab_geometry
+     */
+    public float DetermineManhattanDistanceBetweenNodes(Node nodeFrom, Node nodeTo)
+    {
+        int absDeltaX = Mathf.Abs(nodeFrom.PositionX - nodeTo.PositionX);
+        int absDeltaY = Mathf.Abs(nodeFrom.PositionY - nodeTo.PositionY);
+
+        return (absDeltaX + absDeltaY);
+    }
+
 }

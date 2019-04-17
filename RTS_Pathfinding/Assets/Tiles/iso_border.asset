@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: iso_border
   m_EditorClassIdentifier: 
   m_Sprite: {fileID: 21300000, guid: 1d08cc9ddd4ac954e9e9f0b9181255b4, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.78431374}
   m_Transform:
     e00: 1
     e01: 0

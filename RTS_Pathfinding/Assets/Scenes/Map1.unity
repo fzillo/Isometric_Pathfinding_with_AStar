@@ -9811,9 +9811,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tilemapGraphView: {fileID: 147249988}
-  colorPath: {fileID: 11400000, guid: 84cde7740ba64a54e85a9159f2c77271, type: 2}
-  colorExplored: {fileID: 11400000, guid: f3b2c45b91cbad34dab190e3a7926c58, type: 2}
+  colorStart: {fileID: 11400000, guid: e3f7211504b62e34289a011ffb225855, type: 2}
+  colorGoal: {fileID: 11400000, guid: 9034453a09907014f9d18c2429a85c00, type: 2}
+  colorEasy: {fileID: 11400000, guid: 84cde7740ba64a54e85a9159f2c77271, type: 2}
+  colorMedium: {fileID: 11400000, guid: 30a8007b75232ee4a857e3e47e0f49c6, type: 2}
+  colorHard: {fileID: 11400000, guid: 49ef3629ad0ede14d9086f9d45f6cedb, type: 2}
+  colorPath: {fileID: 11400000, guid: 129023ca50d5063408d9e9368b3d4977, type: 2}
   colorBorder: {fileID: 11400000, guid: 2318005008ed9104c982dead1cb35e01, type: 2}
+  colorDefault: {fileID: 11400000, guid: f3b2c45b91cbad34dab190e3a7926c58, type: 2}
 --- !u!1 &858166778
 GameObject:
   m_ObjectHideFlags: 0
@@ -9943,7 +9948,7 @@ MonoBehaviour:
   graphView: {fileID: 850954546}
   showIterations: 0
   timeStepIterations: 0.1
-  configuredAlgorithm: 1
+  configuredAlgorithm: 3
 --- !u!4 &1377297737
 Transform:
   m_ObjectHideFlags: 0
