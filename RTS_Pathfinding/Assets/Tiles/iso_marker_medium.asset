@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: iso_marker_medium
   m_EditorClassIdentifier: 
   m_Sprite: {fileID: 21300000, guid: 87023e58aee3a9c41b577303396eb090, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.5423229, b: 0, a: 1}
   m_Transform:
     e00: 1
     e01: 0
