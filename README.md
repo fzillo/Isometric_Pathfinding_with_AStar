@@ -4,6 +4,8 @@ This project is about implementing various pathfinding-algorithms in an isometic
 
 ![](Doc/pathfindingdoc.gif)
 
+See here: https://youtu.be/vEEKZleGpIs
+
 Implements the following algorithms:
 * breadth first search
 * Dijkstra
