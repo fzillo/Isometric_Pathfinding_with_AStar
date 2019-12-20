@@ -8,7 +8,7 @@ The following algorithms are used:
 * greedy best first
 * A*
 
-The terrain costs system is rudimentary but accounted by the A* and Dijkstra algorithms.
+The terrain costs system is rudimentary but is taken into account by the A* and Dijkstra algorithm.
 The tiles are Grass (cost: 1), Sand (cost: 2), Water (cost: 3) and Impassable (cost: -).
 
 ![](Doc/pathfindingdoc.gif)
